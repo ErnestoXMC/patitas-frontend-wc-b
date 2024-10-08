@@ -8,16 +8,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import pe.edu.cibertec.patitasfrontendwc.dto.LoginRequestDTO;
 import pe.edu.cibertec.patitasfrontendwc.dto.LoginResponseDTO;
 import pe.edu.cibertec.patitasfrontendwc.viewmodel.LoginModel;
+import reactor.core.publisher.Mono;
 
 @Controller
 @RequestMapping("/login")
 public class LoginController {
 
     @Autowired
-    RestTemplate restTemplateAutenticacion;
+    WebClient webClientAutenticacion;
+
+
+//    @Autowired
+//    RestTemplate restTemplateAutenticacion;
 
     @GetMapping("/inicio")
     public String inicio(Model model){
@@ -40,10 +46,15 @@ public class LoginController {
             return "inicio";
         }
         try {
-            //Invocar Appi de validacion de usuario
+            //Invocar API de validacion de usuario
             LoginRequestDTO loginRequestDTO = new LoginRequestDTO(tipoDocumento, numeroDocumento, password);
-            LoginResponseDTO loginResponseDTO = restTemplateAutenticacion.postForObject("/login", loginRequestDTO, LoginResponseDTO.class);
-
+            Mono<LoginResponseDTO> monoLoginResponseDTO = webClientAutenticacion.post()
+                    .uri("/login")
+                    .body(Mono.just(loginRequestDTO), LoginRequestDTO.class)
+                    .retrieve()
+                    .bodyToMono(LoginResponseDTO.class);
+            //Recuperar resultado del mono
+            LoginResponseDTO loginResponseDTO = monoLoginResponseDTO.block();
             //Validar Respuesta
             if(loginResponseDTO.codigo().equals("00")){
                 LoginModel loginModel = new LoginModel("00", "", loginResponseDTO.nombreUsuario());
