@@ -20,8 +20,6 @@ public class LoginController {
 
     @Autowired
     WebClient webClientAutenticacion;
-
-
 //    @Autowired
 //    RestTemplate restTemplateAutenticacion;
 
