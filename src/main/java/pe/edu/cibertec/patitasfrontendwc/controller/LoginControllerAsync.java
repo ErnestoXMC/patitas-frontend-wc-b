@@ -3,6 +3,8 @@ package pe.edu.cibertec.patitasfrontendwc.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
+import pe.edu.cibertec.patitasfrontendwc.client.AutenticacionClient;
+import pe.edu.cibertec.patitasfrontendwc.client.LogoutClient;
 import pe.edu.cibertec.patitasfrontendwc.dto.LoginRequestDTO;
 import pe.edu.cibertec.patitasfrontendwc.dto.LoginResponseDTO;
 import pe.edu.cibertec.patitasfrontendwc.dto.LogoutRequestDTO;
@@ -16,6 +18,14 @@ public class LoginControllerAsync {
 
     @Autowired
     WebClient webClientAutenticacion;
+
+    @Autowired
+    AutenticacionClient autenticacionClient;
+
+    @Autowired
+    LogoutClient logoutClient;
+
+
 
     @PostMapping("/autenticar-async")
     public Mono<LoginResponseDTO> autenticar(@RequestBody LoginRequestDTO loginRequestDTO){
@@ -46,6 +56,7 @@ public class LoginControllerAsync {
         }
     }
 
+
     @PostMapping("/cerrar-sesion-async")
     public Mono<LogoutResponseDTO> logout(@RequestBody LogoutRequestDTO logoutRequestDTO) {
         if (logoutRequestDTO.tipoDocumento() == null || logoutRequestDTO.tipoDocumento().trim().isEmpty() ||
@@ -73,5 +84,6 @@ public class LoginControllerAsync {
             return Mono.just(new LogoutResponseDTO(false, null, "Error: Ocurrió un problema con el servidor"));
         }
     }
+
 
 }
